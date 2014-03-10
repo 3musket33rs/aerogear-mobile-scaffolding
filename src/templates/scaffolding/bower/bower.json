@@ -1,13 +1,12 @@
 {
-  "name": "boot-todos",
+  "name": "",
   "version": "0.0.0",
   "authors": [
-    "Brian Cavalier <brian@hovercraftstudios.com>"
   ],
   "moduleType": "node",
-  "description": "Todos!",
+  "description": "aerogear, cujojs, rave, topcoat",
   "main": "main",
-  "license": "MIT",
+  "license": "Apache",
   "ignore": [
     "**/.*",
     "node_modules",

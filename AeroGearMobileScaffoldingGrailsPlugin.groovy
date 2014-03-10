@@ -1,4 +1,4 @@
-/* Copyright 2012 the original author or authors.
+/* Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@
  * @since 0.0.1
  */
 
-//comment
-import org.grails.html.mobile.JavascriptDateRegistrar
 
 class AeroGearMobileScaffoldingGrailsPlugin {
 
@@ -35,6 +33,7 @@ class AeroGearMobileScaffoldingGrailsPlugin {
     [ name: "Aramis alias Sebastien Blanc", email: "scm.blanc@gmail.com"],
     [ name: "Athos alias Corinne Krych", email: "corinnekrych@gmail.com" ],
     [ name: "Porthos alias Fabrice Matrat", email: "fabricematrat@gmail.com" ]
+    [ name: "D'Artagnan alias Mathieu Bruyen ", email: "mathbruyen@gmail.com" ]
   ]
 
   def description = '''
@@ -45,8 +44,4 @@ A plugin that scaffold HTML5 mobile application using AeroGear mobile libraries,
   def license = 'APACHE'
   def issueManagement = [system: 'GitHub', url: 'https://github.com/3musket33rs/aerogear-mobile-scaffolding/issues']
   def scm = [url: 'https://github.com/3musket33rs/aerogear-mobile-scaffolding']
-
-  def doWithSpring = {
-    customPropertyEditorRegistrar(JavascriptDateRegistrar)
-  }
 }

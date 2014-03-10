@@ -38,11 +38,12 @@ In URLMapping for exemple:
 
 * Generate the view
 
-    (aerogear-mobile-scaffolding)
-	grails html-generate-views org.myproject.MyDomainClass
+
+    grails html-generate-views org.myproject.MyDomainClass
 
 * Fetch Js dependencies with bower
-	
+
+
     cd web-app
     bower install
     grails run-app
@@ -60,7 +61,7 @@ In web-app/bower_componant/rest
 Available Targets
 =================
 
-	html-generate-views [domainClass] [optional viewName]
+    html-generate-views [domainClass] [optional viewName]
 
 
 Give it a trial and send us feedback!

@@ -34,19 +34,23 @@ In domain class:
 
 
 In URLMapping for exemple:
+
     "/talks"(resources:"talk")
 
 * Generate the view
+Use command line:
 
-
-    grails html-generate-views org.myproject.MyDomainClass
+```
+grails html-generate-views org.myproject.MyDomainClass
+```
 
 * Fetch Js dependencies with bower
 
-
-    cd web-app
-    bower install
-    grails run-app
+```
+cd web-app
+bower install
+grails run-app
+```
 
 * TODO (manual step to  be removed)
 

@@ -19,13 +19,43 @@ Add a dependency to BuildConfig.groovy:
 
 To test it
 ===========
-    (pre-requisite)
-    grails generate-restful-controller org.myproject.MyDomainClass
+* Pre-requisites
+
+Make our domain class RESTful
+In domain class:
+
+    import grails.rest.*
+    @Resource(uri = '/talks', formats = ['json'])
+    class Talk {
+        String description
+        static constraints = {
+        }
+    }
+
+
+In URLMapping for exemple:
+    "/talks"(resources:"talk")
+
+* Generate the view
+
     (aerogear-mobile-scaffolding)
 	grails html-generate-views org.myproject.MyDomainClass
-	cd web-app
-	bower install
-	grails run-app
+
+* Fetch Js dependencies with bower
+	
+    cd web-app
+    bower install
+    grails run-app
+
+* TODO (manual step to  be removed)
+
+In web-app/bower_componant/cola
+
+    "moduleType":"amd",
+
+In web-app/bower_componant/rest
+
+    "moduleType":"node¬",
 
 Available Targets
 =================

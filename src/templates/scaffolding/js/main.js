@@ -16,7 +16,7 @@ module.exports = fluent(function(config) {
         // >>> BEGIN ${className}
         .add('${classNameLowerCase}s@controller', ${className}sController)
         .add('${classNameLowerCase}s@model', function() {
-            return new Rest('http://localhost:8080/${projectName}/${classNameLowerCase}s');
+            return new Rest('http://localhost:8080/${project}/${classNameLowerCase}s');
         })
         .add('${classNameLowerCase}s@view', ['render','insert','qs'], function(render, insert, qs) {
             var view = render(${classNameLowerCase}sListTemplate);

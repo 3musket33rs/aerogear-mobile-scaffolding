@@ -1,0 +1,51 @@
+<%
+def uncapitalize(s) { s[0].toLowerCase() + s[1..-1]}
+%><!doctype html>
+<html data-debug>
+<head>
+    <title>${project}</title>
+    <link href="css/topcoat-mobile-light.css" rel="stylesheet" media="screen">
+    <link href="css/custom.css" rel="stylesheet" media="screen">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body data-bard>
+
+<div class="topcoat-navigation-bar bar">
+    <div class="topcoat-navigation-bar__item center full">
+        <h1 class="topcoat-navigation-bar__title">Controller List</h1>
+    </div>
+</div>
+
+
+<div class="topcoat-button-list center" style="margin:2em auto;max-width: 25em">
+
+    <%
+        className.each {
+        def controllerClassNameLowerCase = it.toLowerCase()
+        if (controllerClassNameLowerCase != 'platformtools' && controllerClassNameLowerCase != 'dbdoc'
+            && controllerClassNameLowerCase != 'app') {
+    %>  <div class="topcoat-button-list__item">
+        <button class="topcoat-button-list__button"><a href="${controllerClassNameLowerCase}-index.html">${it}</a></button>
+        </div>
+    <%}}%>
+
+    <div class="topcoat-button-list__item">
+        <button class="topcoat-button-list__button"><a href="domain_list_mockup.html">controller: todo</a></button>
+    </div>
+    <div class="topcoat-button-list__item">
+        <button class="topcoat-button-list__button">controller: assignee</button>
+    </div>
+    <div class="topcoat-button-list__item">
+        <button class="topcoat-button-list__button">controller: item</button>
+    </div>
+</div>
+
+<div class="topcoat-navigation-bar bar bottom">
+    <div class="topcoat-navigation-bar__item center full">
+        <h1 class="topcoat-navigation-bar__title">Powered by us (<a href="mailto:th33musk3t33rs@gmail.com">th33musk3t33rs@gmail.com</a>)</h1>
+    </div>
+</div>
+</body>
+</html>

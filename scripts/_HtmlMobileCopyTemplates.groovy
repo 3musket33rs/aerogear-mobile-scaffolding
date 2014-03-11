@@ -25,24 +25,23 @@ includeTargets << grailsScript("_GrailsInit")
 target(htmlMobileCopyTemplates: "generate HTML5 mobile view with different section for CRUD") {
   depends checkVersion, parseArguments
 
-    def targetPaths = [html: "$basedir/src/templates/scaffolding",
-                       img: "$basedir/src/templates/scaffolding"]
+    def targetPaths = [html: "$basedir/src/templates/scaffolding"]
 
     def overwrite = false
   
-    if (targetPaths.any { new File(it.value).exists() }) {
-      if (!isInteractive || confirmInput('Overwrite existing templates?', 'overwrite.templates')) {
-        overwrite = true
-      }
-    }
-
-    targetPaths.each { sourcePath, targetDir ->
-    def sourceDir = "$aeroGearMobileScaffoldingPluginDir/src/templates/scaffolding/$sourcePath"
-      ant.mkdir dir: targetDir
-      ant.copy(todir: targetDir, overwrite: overwrite) {
-        fileset dir: sourceDir
-      }
-    }
+//    if (targetPaths.any { new File(it.value).exists() }) {
+//      if (!isInteractive || confirmInput('Overwrite existing templates?', 'overwrite.templates')) {
+//        overwrite = true
+//      }
+//    }
+//
+//    targetPaths.each { sourcePath, targetDir ->
+//    def sourceDir = "$aeroGearMobileScaffoldingPluginDir/src/templates/scaffolding/$sourcePath"
+//      ant.mkdir dir: targetDir
+//      ant.copy(todir: targetDir, overwrite: overwrite) {
+//        fileset dir: sourceDir
+//      }
+//    }
 
     def source = "$aeroGearMobileScaffoldingPluginDir/src/templates/scaffolding/"
     def destination = "$basedir/src/templates/scaffolding/"
@@ -53,20 +52,27 @@ target(htmlMobileCopyTemplates: "generate HTML5 mobile view with different secti
     }
 
     ant.mkdir dir: destination + "js"
-    ant.copy( todir:destination, overwrite: overwrite) {
+    ant.copy( todir:destination + "js", overwrite: overwrite) {
         fileset( dir: source + "js/" )
     }
+
+    ant.mkdir dir: destination + "cordova"
+    ant.copy( todir:destination + "cordova", overwrite: overwrite) {
+        fileset( dir: source + "cordova/" )
+    }
+
     ant.mkdir dir: destination + "bower"
     ant.copy( todir:destination+ "bower", overwrite: overwrite) {
         fileset( dir: source + "bower/" )
     }
+
     ant.mkdir dir: destination + "css"
     ant.copy( todir:destination + "css/" , overwrite: overwrite) {
         fileset( dir: source + "css/" )
     }
 
     ant.mkdir dir: destination + "img"
-    ant.copy( todir:destination + "img/" , overwrite: overwrite) {
+    ant.copy( todir:destination + "img" , overwrite: overwrite) {
         fileset( dir: source + "img/" )
     }
 

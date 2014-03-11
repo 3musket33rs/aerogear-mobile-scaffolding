@@ -77,6 +77,9 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         def source = "$base/src/templates/scaffolding/"
         def destination = "$base/web-app/"
         def ant = new AntBuilder();
+        ant.copy(todir:destination + "js/") {
+            fileset(dir: source + "js/")
+        }
         ant.copy(todir:destination ) {
             fileset(dir: source + "bower/")
         }
@@ -216,23 +219,45 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
 
         if (templateText) {
             def t = engine.createTemplate(templateText)
-
+            //boolean hasPush = pluginManager?.hasGrailsPlugin('Aerogear-UnifiedPush-Client')
+            def pushServerURL = grailsApplication.config?.grails?.scaffolding?.aerogear?.push?.pushServerURL
+            if (!pushServerURL)
+                pushServerURL = "XXXX-XXXX"
+            def variantID = grailsApplication.config?.grails?.scaffolding?.aerogear?.push?.variantID
+            if (!variantID)
+                variantID = "YYYY-YYYY"
+            def variantSecret = grailsApplication.config?.grails?.scaffolding?.aerogear?.push?.variantSecret
+            if (!variantSecret)
+                variantSecret = "SHUUUT-SECRET"
+            println "variant ${variantID}"
             def project = this.grailsApplication.metadata['app.name']
             def binding = [ project: project,
                     domainClass: domainClass,
                     className: domainClass.shortName,
+                    pushServerURL: pushServerURL,
+                    variantID: variantID,
+                    variantSecret: variantSecret,
                     grailsApp : grailsApplication]
             def templateResolved = t.make(binding).toString()
+            //println templateResolved
             String resultVariable = templateResolved.getAt(templateResolved.indexOf("// >>> BEGIN VARIABLE ${domainClass.shortName}") .. templateResolved.indexOf("// >>> END VARIABLE ${domainClass.shortName}") + "// >>> END VARIABLE ${domainClass.shortName}".length() - 1)
             //println ">>> Content of BEGIN VARIABLE " + resultVariable
             if (!content.contains(resultVariable)) {
                 out << resultVariable + '\n'
             }
+
             String resultConfig = templateResolved.getAt(templateResolved.indexOf("// >>> BEGIN ${domainClass.shortName}") .. templateResolved.indexOf("// >>> END ${domainClass.shortName}") + "// >>> END ${domainClass.shortName}".length() - 1)
             //println ">>> Content of BEGIN " + resultConfig
             if (!content.contains(resultConfig)) {
                 content = content.replace(";\n});", "\t\t" +resultConfig + "\n;\n});")
             }
+
+            String resultPushConfig = templateResolved.getAt(templateResolved.indexOf("// >>> PUSH") .. templateResolved.indexOf("// >>> PUSH END") + "// >>> PUSH END".length() - 1)
+            //println ">>> Content of PUSH" + resultPushConfig
+            if (!content.contains(resultPushConfig)) {
+                content = content.replace("// >>> PUSH END", resultPushConfig)
+            }
+
             out << content
 
         }
@@ -246,7 +271,7 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         copyGrailsMobileFrameworkIfNotPresent(destDir)
 
         def destFile, viewsDir
-        //println ":::::::templateViewName " + templateViewName
+        println ":::::::templateViewName " + templateViewName
         if(suffix == ".html" && templateViewName != "index.html") {
             viewsDir = new File("$destDir/web-app/app/" + domainClass.propertyName)
         }
@@ -255,6 +280,9 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         }
         if(templateViewName == "main.js") {
             viewsDir = new File("$destDir/web-app/")
+        }
+        if(templateViewName == "config.xml") {
+            viewsDir = new File("$destDir/web-app")
         }
         if (!viewsDir?.exists()) viewsDir?.mkdirs()
         if(suffix == ".html" && templateViewName != "index.html") {
@@ -270,14 +298,38 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
                 generateView domainClass, "js-app/" + templateViewName, writer
             }
         }
+        if(templateViewName == "config.xml") {
+            destFile = new File(viewsDir, "config.xml")
+            destFile?.withWriter { Writer writer ->
+                generateView domainClass, "cordova/" + templateViewName, writer
+            }
+        }
         if(templateViewName == "main.js") {
             destFile = new File(viewsDir, "main.js")
             if (!destFile?.exists()) {
                 String initialContent = """
 var Rest = require('cola/data/Rest');
 var fluent = require('wire/config/fluent');
+var pushNotification = require('./js/mk/push/aerogear/pushNotification');
 
 module.exports = fluent(function(config) {
+    // to be added at startup
+    var pushConfig = {
+    // >>> PUSH
+    // >>> PUSH END
+    successHandler: function(result) {
+       console.log(result);
+       alert(result);
+    },
+    errorHandler: function (error) {
+       console.log(error);
+       alert(error);
+    },
+    onNotification: function (e) {
+      alert(e.alert);
+    }
+    }
+    pushNotification(pushConfig);
     return config
     ;
 });
@@ -287,12 +339,12 @@ module.exports = fluent(function(config) {
                 }
                 String content = initialContent
                 destFile?.withWriter { Writer writer ->
-                    generateViewForMainFile domainClass, templateViewName, content, writer
+                    generateViewForMainFile domainClass, "js-app/" + templateViewName, content, writer
                 }
             } else {
                 String content = destFile?.text
                 destFile?.withWriter { Writer writer ->
-                    generateViewForMainFile domainClass, templateViewName, content, writer
+                    generateViewForMainFile domainClass, "js-app/" + templateViewName, content, writer
                 }
             }
         }
@@ -308,7 +360,7 @@ module.exports = fluent(function(config) {
             try {
                 resources.addAll(resolver.getResources("file:$templatesDirPath/**/*.html").filename)
                 resources.addAll(resolver.getResources("file:$templatesDirPath/**/*.js").filename)
-                resources.addAll(resolver.getResources("file:$templatesDirPath/*.xml").filename)
+                resources.addAll(resolver.getResources("file:$templatesDirPath/**/*.xml").filename)
             } catch (e) {
                 event 'StatusError', ['Error while loading views from grails-app scaffolding folder', e]
             }

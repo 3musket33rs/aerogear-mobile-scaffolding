@@ -32,7 +32,7 @@ class AeroGearMobileScaffoldingGrailsPlugin {
   def developers = [
     [ name: "Aramis alias Sebastien Blanc", email: "scm.blanc@gmail.com"],
     [ name: "Athos alias Corinne Krych", email: "corinnekrych@gmail.com" ],
-    [ name: "Porthos alias Fabrice Matrat", email: "fabricematrat@gmail.com" ]
+    [ name: "Porthos alias Fabrice Matrat", email: "fabricematrat@gmail.com" ],
     [ name: "D'Artagnan alias Mathieu Bruyen ", email: "mathbruyen@gmail.com" ]
   ]
 

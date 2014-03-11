@@ -10,8 +10,32 @@ var ${classNameLowerCase}sListTemplate = require('./app/${classNameLowerCase}/${
 
 var Rest = require('cola/data/Rest');
 var fluent = require('wire/config/fluent');
+var pushNotification = require('./js/mk/push/aerogear/pushNotification');
 
 module.exports = fluent(function(config) {
+
+    // to be added at startup
+    var pushConfig = {
+        // >>> PUSH
+        pushServerURL: "${pushServerURL}",
+        variantID: "${variantID}",
+        variantSecret: "${variantSecret}",
+        // >>> PUSH END
+        successHandler: function(result) {
+            console.log(result);
+            alert(result);
+        },
+        errorHandler: function (error) {
+            console.log(error);
+            alert(error);
+        },
+
+        onNotification: function (e) {
+            alert(e.alert);
+        }
+    };
+    pushNotification(pushConfig);
+
     return config
         // >>> BEGIN ${className}
         .add('${classNameLowerCase}s@controller', ${className}sController)

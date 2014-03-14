@@ -34,13 +34,9 @@ insert: { after: 'controllerView' },
 bind: {
     to: { \$ref: '${classNameLowerCase}s' },
 bindings : {
-<%
-props.eachWithIndex { p, i ->
-%>
-    ${p.name}: ".${p.name}",
-<%
-}
-%>
+
+    ${props[0].name}: ".${props[0].name}",
+
     }
 }
 },
@@ -73,7 +69,7 @@ connect :{
 ${classNameLowerCase}Store: {
     create: {
     module: '../AeroGearCore',
-    args: ['http://localhost:8080/${projectName}/', '${classNameLowerCase}s', {type:'SessionLocal', settings :{storageType:'localStorage'}}]
+    args: ['http://localhost:8080/${project}/', '${classNameLowerCase}s', {type:'SessionLocal', settings :{storageType:'localStorage'}}]
 },
 bind: {
     to: { \$ref: '${classNameLowerCase}s' }

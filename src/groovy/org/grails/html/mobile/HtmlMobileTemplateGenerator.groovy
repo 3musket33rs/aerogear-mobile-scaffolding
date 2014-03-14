@@ -17,7 +17,6 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
     HtmlMobileTemplateGenerator(ClassLoader classLoader, String viewName) {
         super(classLoader)
         this.viewName = viewName
-        println ":::::::::::::ctr"+viewName
     }
 
     def uncapitalize(s) { s[0].toLowerCase() + s[1..-1]}
@@ -42,34 +41,23 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
 
     void generateIndex(String destDir, domainClass) {
         Assert.hasText destDir, "Argument [destDir] not specified"
-        println "\n1"
-        def destFile = new File("$destDir/web-app/app/controller/template.html")
 
-        println "\n2"
+        def destFile = new File("$destDir/web-app/app/controller/template.html")
         destFile.withWriter { w ->
-            println "\n3"
             generateIndexForAllDomainClass(w, domainClass)
         }
     }
 
     void generateIndexForAllDomainClass(Writer out, domainClass) {
-        println "\n4"
         def templateText = getTemplateText("controller/template.html")
-        println "\n5"
         def project = this.grailsApplication.metadata['app.name']
         def className = []
-        grailsApplication.controllerClasses.each{
-            className << it.name
+        grailsApplication.domainClasses.each {
+            className << it.shortName
         }
-        if (!className.contains(domainClass.name)) {
-            className << domainClass.name
-        }
-        println "\n6"
         def binding = [className: className,
                 project: project]
-        println "\n7"+templateText
         def t = engine.createTemplate(templateText)
-        println "\n8"
         t.make(binding).writeTo(out)
     }
 
@@ -244,7 +232,6 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
             def variantSecret = grailsApplication.config?.grails?.scaffolding?.aerogear?.push?.variantSecret
             if (!variantSecret)
                 variantSecret = "SHUUUT-SECRET"
-            println "variant ${variantID}"
             def project = this.grailsApplication.metadata['app.name']
             def binding = [ project: project,
                     domainClass: domainClass,
@@ -255,21 +242,17 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
                     variantSecret: variantSecret,
                     grailsApp : grailsApplication]
             def templateResolved = t.make(binding).toString()
-            println ">>>>" + templateResolved
             String resultBeginView = templateResolved.getAt(templateResolved.indexOf("// BeginView ${domainClass.shortName}") .. templateResolved.indexOf("// EndView ${domainClass.shortName}") + "// EndView ${domainClass.shortName}".length() - 1)
-            println ">>> Content of BeginView ${domainClass.shortName}==\n" + resultBeginView
             if (!content.contains(resultBeginView)) {
                 content = content.replace("// Insert Here View", resultBeginView + "\n// Insert Here View")
             }
 
             String resultBeginController = templateResolved.getAt(templateResolved.indexOf("// BeginController ${domainClass.shortName}") .. templateResolved.indexOf("// EndController ${domainClass.shortName}") + "// EndController ${domainClass.shortName}".length() - 1)
-            println ">>> Content of BeginController ${domainClass.shortName}==\n" + resultBeginController
             if (!content.contains(resultBeginController)) {
                 content = content.replace("// Insert Here Controller", resultBeginController + "\n// Insert Here Controller")
             }
 
             out << content
-            println "End generation main.js"
         }
     }
 
@@ -280,7 +263,6 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
 
         def destFile, viewsDir
 
-        println ":::::::templateViewName " + templateViewName
         if(templateViewName == "run.js") {
             viewsDir = new File("$destDir/web-app")
         }
@@ -359,8 +341,8 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
                 String initialContent = """
 define({
     theme: { modules: [
-    {module:'css/topcoat-mobile-light.css'},
-        {module:'css/custom.css'}
+    {module:'theme/topcoat-mobile-light.css'},
+        {module:'theme/custom.css'}
 ]},
 controllerView: {
     render: {

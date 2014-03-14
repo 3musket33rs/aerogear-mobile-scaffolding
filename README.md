@@ -52,16 +52,6 @@ bower install
 grails run-app
 ```
 
-* TODO (manual step to  be removed)
-
-In web-app/bower_componant/cola
-
-    "moduleType":"amd",
-
-In web-app/bower_componant/rest
-
-    "moduleType":"node¬",
-
 Available Targets
 =================
 

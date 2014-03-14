@@ -1,0 +1,20 @@
+.bottom {
+    position: fixed;
+    bottom: 0;
+    box-shadow: 0 -1px 2px hsla(207, 5%, 0%, .2);
+}
+
+.settings {
+    text-align: center;
+}
+
+.hidden {
+    display:none;
+}
+
+.our-label {
+    display: inline-block;
+    width: 210px;
+    text-align: center;
+    margin: 10px;
+}

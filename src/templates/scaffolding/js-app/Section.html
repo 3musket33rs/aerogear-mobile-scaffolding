@@ -1,0 +1,60 @@
+<%
+def uncapitalize(s) { s[0].toLowerCase() + s[1..-1]}
+classNameLowerCase = uncapitalize(className)
+projectName = project.toLowerCase()
+%>
+<section class="${classNameLowerCase}s-section">
+    <header class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item center full">
+            <h1 class="topcoat-navigation-bar__title">${projectName}</h1>
+        </div>
+    </header>
+
+    <section class="topcoat-list ${classNameLowerCase}s-list" style="margin-bottom: 4em">
+        <div class="topcoat-list__header center">
+            <input type="search" value="" placeholder="search" class="topcoat-search-input"/>
+        </div>
+        <ul class="topcoat-list__container">
+            <li class="topcoat-list__item display description">
+                <span class="description"></span>
+            </li>
+        </ul>
+    </section>
+
+    <form class="${classNameLowerCase}-display hidden" style="margin:2em auto; margin-bottom: 4em; max-width: 13em">
+        <%
+        props.eachWithIndex { p, i ->
+        %>
+
+        <label>${p.name}<br/><br/>
+            <input type="text" class="topcoat-text-input" placeholder="text" name="${p.name}">
+        </label><br/><br/>
+
+        <%
+        }
+        %>
+
+        <input class="hidden" name="id"/>
+        <input class="hidden" name="version"/>
+        <input class="hidden" name="class"/>
+        <br/><br/>
+    </form>
+
+    <footer class="topcoat-tab-bar full bottom">
+        <div class="topcoat-tab-bar__item ${classNameLowerCase}s-list">
+            <button class="topcoat-button full displayAdd" >Add</button>
+        </div>
+        <div class="topcoat-tab-bar__item ${classNameLowerCase}s-element hidden ">
+            <button class="topcoat-button full cancel">Cancel</button>
+        </div>
+        <div class="topcoat-tab-bar__item ${classNameLowerCase}s-element-update hidden ">
+            <button class="topcoat-button full remove">Delete</button>
+        </div>
+        <div class="topcoat-tab-bar__item ${classNameLowerCase}s-element-add hidden">
+            <button class="topcoat-button full add">Add</button>
+        </div>
+        <div class="topcoat-tab-bar__item ${classNameLowerCase}s-element-update hidden">
+            <button class="topcoat-button full update">Update</button>
+        </div>
+    </footer>
+</section>

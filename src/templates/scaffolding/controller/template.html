@@ -1,0 +1,27 @@
+<section class="controller-section hidden">
+    <div class="topcoat-navigation-bar bar">
+        <div class="topcoat-navigation-bar__item center full">
+            <h1 class="topcoat-navigation-bar__title">Controllers List</h1>
+        </div>
+    </div>
+
+    <div class="topcoat-button-list center" style="margin:2em auto;max-width: 25em">
+        <%
+        className.each {
+        def controllerClassNameLowerCase = it.toLowerCase()
+        if (controllerClassNameLowerCase != 'platformtools' && controllerClassNameLowerCase != 'dbdoc'
+        && controllerClassNameLowerCase != 'app') {
+        %>
+        <div class="topcoat-button-list__item">
+            <button class="topcoat-button-list__button todo">${it}</button>
+        </div>
+        <%}}%>
+
+    </div>
+
+    <footer class="topcoat-tab-bar full bottom">
+        <div class="topcoat-tab-bar__item center full">
+            <p>Powered by us (<a href="mailto:th33musk3t33rs@gmail.com">th33musk3t33rs@gmail.com</a>)</p>
+        </div>
+    </footer>
+</section>

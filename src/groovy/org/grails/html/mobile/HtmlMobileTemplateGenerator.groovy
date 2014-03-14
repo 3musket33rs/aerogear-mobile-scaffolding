@@ -42,14 +42,20 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
 
     void generateIndex(String destDir, domainClass) {
         Assert.hasText destDir, "Argument [destDir] not specified"
-        def destFile = new File("$destDir/web-app/index.html")
+        println "\n1"
+        def destFile = new File("$destDir/web-app/app/controller/template.html")
+
+        println "\n2"
         destFile.withWriter { w ->
-            generateIndex(w, domainClass)
+            println "\n3"
+            generateIndexForAllDomainClass(w, domainClass)
         }
     }
 
-    void generateIndex(Writer out, domainClass) {
-        def templateText = getTemplateText("global-index.html")
+    void generateIndexForAllDomainClass(Writer out, domainClass) {
+        println "\n4"
+        def templateText = getTemplateText("controller/template.html")
+        println "\n5"
         def project = this.grailsApplication.metadata['app.name']
         def className = []
         grailsApplication.controllerClasses.each{
@@ -58,9 +64,12 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         if (!className.contains(domainClass.name)) {
             className << domainClass.name
         }
+        println "\n6"
         def binding = [className: className,
                 project: project]
+        println "\n7"+templateText
         def t = engine.createTemplate(templateText)
+        println "\n8"
         t.make(binding).writeTo(out)
     }
 
@@ -83,8 +92,8 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         ant.copy(todir:destination ) {
             fileset(dir: source + "bower/")
         }
-        ant.copy(todir:destination + "css/" ) {
-            fileset(dir: source + "css/" )
+        ant.copy(todir:destination + "theme/" ) {
+            fileset(dir: source + "theme/" )
         }
         ant.copy(todir:destination + "img/") {
             fileset(dir: source + "img/")
@@ -101,7 +110,6 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         if (templateText) {
             def t = engine.createTemplate(templateText)
             def project = this.grailsApplication.metadata['app.name']
-            //println("::::templateTest" + templateText)
 
             def excludedProps = Event.allEvents.toList() << 'id' << 'version' << 'longitude' << 'latitude'
             def allowedNames = domainClass.persistentProperties*.name << 'dateCreated' << 'lastUpdated'
@@ -218,6 +226,13 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         def templateText = getTemplateText(templateViewName)
 
         if (templateText) {
+            def excludedProps = Event.allEvents.toList() << 'id' << 'version' << 'longitude' << 'latitude'
+            def allowedNames = domainClass.persistentProperties*.name << 'dateCreated' << 'lastUpdated'
+            def props = domainClass.properties.findAll { allowedNames.contains(it.name) && !excludedProps.contains(it.name) && it.type != null && !Collection.isAssignableFrom(it.type) }
+
+            if (props.size() == domainClass.constrainedProperties.size()) {
+                props = modifyOrderBasedOnConstraints(props, domainClass.constrainedProperties)
+            }
             def t = engine.createTemplate(templateText)
             //boolean hasPush = pluginManager?.hasGrailsPlugin('Aerogear-UnifiedPush-Client')
             def pushServerURL = grailsApplication.config?.grails?.scaffolding?.aerogear?.push?.pushServerURL
@@ -233,67 +248,95 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
             def project = this.grailsApplication.metadata['app.name']
             def binding = [ project: project,
                     domainClass: domainClass,
+                    props: props,
                     className: domainClass.shortName,
                     pushServerURL: pushServerURL,
                     variantID: variantID,
                     variantSecret: variantSecret,
                     grailsApp : grailsApplication]
             def templateResolved = t.make(binding).toString()
-            //println templateResolved
-            String resultVariable = templateResolved.getAt(templateResolved.indexOf("// >>> BEGIN VARIABLE ${domainClass.shortName}") .. templateResolved.indexOf("// >>> END VARIABLE ${domainClass.shortName}") + "// >>> END VARIABLE ${domainClass.shortName}".length() - 1)
-            //println ">>> Content of BEGIN VARIABLE " + resultVariable
-            if (!content.contains(resultVariable)) {
-                out << resultVariable + '\n'
+            println ">>>>" + templateResolved
+            String resultBeginView = templateResolved.getAt(templateResolved.indexOf("// BeginView ${domainClass.shortName}") .. templateResolved.indexOf("// EndView ${domainClass.shortName}") + "// EndView ${domainClass.shortName}".length() - 1)
+            println ">>> Content of BeginView ${domainClass.shortName}==\n" + resultBeginView
+            if (!content.contains(resultBeginView)) {
+                content = content.replace("// Insert Here View", resultBeginView + "\n// Insert Here View")
             }
 
-            String resultConfig = templateResolved.getAt(templateResolved.indexOf("// >>> BEGIN ${domainClass.shortName}") .. templateResolved.indexOf("// >>> END ${domainClass.shortName}") + "// >>> END ${domainClass.shortName}".length() - 1)
-            //println ">>> Content of BEGIN " + resultConfig
-            if (!content.contains(resultConfig)) {
-                content = content.replace(";\n});", "\t\t" +resultConfig + "\n;\n});")
-            }
-
-            String resultPushConfig = templateResolved.getAt(templateResolved.indexOf("// >>> PUSH") .. templateResolved.indexOf("// >>> PUSH END") + "// >>> PUSH END".length() - 1)
-            //println ">>> Content of PUSH" + resultPushConfig
-            if (!content.contains(resultPushConfig)) {
-                content = content.replace("// >>> PUSH END", resultPushConfig)
+            String resultBeginController = templateResolved.getAt(templateResolved.indexOf("// BeginController ${domainClass.shortName}") .. templateResolved.indexOf("// EndController ${domainClass.shortName}") + "// EndController ${domainClass.shortName}".length() - 1)
+            println ">>> Content of BeginController ${domainClass.shortName}==\n" + resultBeginController
+            if (!content.contains(resultBeginController)) {
+                content = content.replace("// Insert Here Controller", resultBeginController + "\n// Insert Here Controller")
             }
 
             out << content
-
+            println "End generation main.js"
         }
     }
 
     @Override
     void generateView(GrailsDomainClass domainClass, String templateViewName, String destDir) {
-        def suffix = templateViewName.find(/\.\w+$/)
-        def project = this.grailsApplication.metadata['app.name'].toLowerCase()
 
         copyGrailsMobileFrameworkIfNotPresent(destDir)
 
         def destFile, viewsDir
+
         println ":::::::templateViewName " + templateViewName
-        if(suffix == ".html" && templateViewName != "index.html") {
+        if(templateViewName == "run.js") {
+            viewsDir = new File("$destDir/web-app")
+        }
+        if(templateViewName == "AeroGearCore.js") {
+            viewsDir = new File("$destDir/web-app")
+        }
+
+        if(templateViewName == "Controller.js") {
+            viewsDir = new File("$destDir/web-app/app/controller")
+        }
+        if(templateViewName == "DomainController.js") {
             viewsDir = new File("$destDir/web-app/app/" + domainClass.propertyName)
         }
-        if(templateViewName == "Controller.js") {
+        if(templateViewName == "Section.html") {
             viewsDir = new File("$destDir/web-app/app/" + domainClass.propertyName)
         }
         if(templateViewName == "main.js") {
-            viewsDir = new File("$destDir/web-app/")
+            viewsDir = new File("$destDir/web-app/app")
         }
         if(templateViewName == "config.xml") {
             viewsDir = new File("$destDir/web-app")
         }
+
+        if(templateViewName == "index.html") {
+            viewsDir = new File("$destDir/web-app/")
+        }
+
         if (!viewsDir?.exists()) viewsDir?.mkdirs()
-        if(suffix == ".html" && templateViewName != "index.html") {
-            destFile = new File(viewsDir, domainClass.propertyName + templateViewName)
+
+        if(templateViewName == "AeroGearCore.js") {
+            destFile = new File(viewsDir, "AeroGearCore.js")
+            destFile?.withWriter { Writer writer ->
+                generateView domainClass, "js/" + templateViewName, writer
+            }
+        }
+        if(templateViewName == "run.js") {
+            destFile = new File(viewsDir, "run.js")
+            destFile?.withWriter { Writer writer ->
+                generateView domainClass, "js/" + templateViewName, writer
+            }
+        }
+        if(templateViewName == "Controller.js") {
+            destFile = new File(viewsDir, "Controller.js")
+            destFile?.withWriter { Writer writer ->
+                generateView domainClass, "controller/" + templateViewName, writer
+            }
+        }
+
+        if(templateViewName == "DomainController.js") {
+            destFile = new File(viewsDir, domainClass.shortName + "Controller.js")
             destFile?.withWriter { Writer writer ->
                 generateView domainClass, "js-app/" + templateViewName, writer
             }
         }
-
-        if(templateViewName == "Controller.js") {
-            destFile = new File(viewsDir, domainClass.shortName + "sController.js")
+        if(templateViewName == "Section.html") {
+            destFile = new File(viewsDir, domainClass.shortName + "Section.html")
             destFile?.withWriter { Writer writer ->
                 generateView domainClass, "js-app/" + templateViewName, writer
             }
@@ -304,35 +347,45 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
                 generateView domainClass, "cordova/" + templateViewName, writer
             }
         }
+        if(templateViewName == "index.html") {
+            destFile = new File(viewsDir, "index.html")
+            destFile?.withWriter { Writer writer ->
+                generateView domainClass, "controller/" + templateViewName, writer
+            }
+        }
         if(templateViewName == "main.js") {
             destFile = new File(viewsDir, "main.js")
             if (!destFile?.exists()) {
                 String initialContent = """
-var Rest = require('cola/data/Rest');
-var fluent = require('wire/config/fluent');
-var pushNotification = require('./js/mk/push/aerogear/pushNotification');
-
-module.exports = fluent(function(config) {
-    // to be added at startup
-    var pushConfig = {
-    // >>> PUSH
-    // >>> PUSH END
-    successHandler: function(result) {
-       console.log(result);
-       alert(result);
-    },
-    errorHandler: function (error) {
-       console.log(error);
-       alert(error);
-    },
-    onNotification: function (e) {
-      alert(e.alert);
+define({
+    theme: { modules: [
+    {module:'css/topcoat-mobile-light.css'},
+        {module:'css/custom.css'}
+]},
+controllerView: {
+    render: {
+    template: { module: 'text!app/controller/template.html' }
+},
+insert: { at: 'dom.first!body' }
+},
+controller: {
+    on: {
+    controllerView: {
+    // Insert Here View
     }
-    }
-    pushNotification(pushConfig);
-    return config
-    ;
+}
+},
+// Insert Here Controller
+form: { module: 'cola/dom/form' },
+// Wire.js plugins
+\$plugins: [
+        { module: 'wire/dom', classes: { init: 'loading' } },
+        { module: 'wire/dom/render' }, { module: 'wire/on' },
+        { module: 'wire/connect' }, { module: 'wire/aop' },
+        { module: 'cola' }
+]
 });
+
 """
                 destFile?.withWriter {Writer writer ->
                     writer << initialContent

@@ -25,10 +25,10 @@ includeTargets << grailsScript("_GrailsInit")
 target(htmlMobileCopyTemplates: "generate HTML5 mobile view with different section for CRUD") {
   depends checkVersion, parseArguments
 
-    def targetPaths = [html: "$basedir/src/templates/scaffolding"]
-
-    def overwrite = false
-  
+//    def targetPaths = [controller: "$basedir/src/templates/scaffolding"]
+//
+    def overwrite = true
+//
 //    if (targetPaths.any { new File(it.value).exists() }) {
 //      if (!isInteractive || confirmInput('Overwrite existing templates?', 'overwrite.templates')) {
 //        overwrite = true
@@ -45,6 +45,12 @@ target(htmlMobileCopyTemplates: "generate HTML5 mobile view with different secti
 
     def source = "$aeroGearMobileScaffoldingPluginDir/src/templates/scaffolding/"
     def destination = "$basedir/src/templates/scaffolding/"
+
+    ant.mkdir dir: destination + "controller"
+    ant.copy( todir:destination + "controller", overwrite: overwrite) {
+        fileset( dir: source + "controller/")
+    }
+
 
     ant.mkdir dir: destination + "js-app"
     ant.copy( todir:destination + "js-app", overwrite: overwrite) {
@@ -66,9 +72,9 @@ target(htmlMobileCopyTemplates: "generate HTML5 mobile view with different secti
         fileset( dir: source + "bower/" )
     }
 
-    ant.mkdir dir: destination + "css"
-    ant.copy( todir:destination + "css/" , overwrite: overwrite) {
-        fileset( dir: source + "css/" )
+    ant.mkdir dir: destination + "theme"
+    ant.copy( todir:destination + "theme/" , overwrite: overwrite) {
+        fileset( dir: source + "theme/" )
     }
 
     ant.mkdir dir: destination + "img"

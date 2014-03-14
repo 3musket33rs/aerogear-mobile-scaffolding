@@ -81,6 +81,7 @@ def generateForDomainClass(domainClass, viewName) {
     if (generateViews) {
         event 'StatusUpdate', ["Generating views for domain class ${domainClass.fullName}"]
         templateGenerator.generateViews(domainClass, basedir)
+        templateGenerator.generateIndex(basedir, domainClass)
         event 'GenerateViewsEnd', [domainClass.fullName]
     }
 }

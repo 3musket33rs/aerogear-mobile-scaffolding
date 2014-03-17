@@ -61,11 +61,8 @@ target(generateForOne: 'Generates controllers and views for only one domain clas
 }
 
 def initHtmlMobileTemplate(viewName) {
-    println ":::::::: before loading" + viewName
     def htmlTemplateGeneratorClass = classLoader.loadClass("org.grails.html.mobile.HtmlMobileTemplateGenerator")
     def templateGenerator = htmlTemplateGeneratorClass.newInstance(classLoader, viewName)
-
-    println ":::::::: after loading"
 
     templateGenerator.grailsApplication = grailsApp
     templateGenerator.pluginManager = pluginManager

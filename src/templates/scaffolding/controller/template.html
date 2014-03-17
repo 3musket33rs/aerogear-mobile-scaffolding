@@ -1,23 +1,23 @@
-<section class="controller-section hidden">
-    <div class="topcoat-navigation-bar bar">
+<%
+def uncapitalize(s) { s[0].toLowerCase() + s[1..-1]}
+%><section class="controller-section">
+    <header class="topcoat-navigation-bar bar">
         <div class="topcoat-navigation-bar__item center full">
-            <h1 class="topcoat-navigation-bar__title">Controllers List</h1>
+            <h1 class="topcoat-navigation-bar__title">Controller List</h1>
         </div>
-    </div>
+    </header>
 
-    <div class="topcoat-button-list center" style="margin:2em auto;max-width: 25em">
-        <%
+    <section class="topcoat-list" style="margin-bottom: 4em">
+        <ul class="topcoat-list__container"><%
         className.each {
         def controllerClassNameLowerCase = it.toLowerCase()
+        def uncapitalizedClassName = uncapitalize(it)    
         if (controllerClassNameLowerCase != 'platformtools' && controllerClassNameLowerCase != 'dbdoc'
         && controllerClassNameLowerCase != 'app') {
         %>
-        <div class="topcoat-button-list__item">
-            <button class="topcoat-button-list__button todo">${it}</button>
-        </div>
-        <%}}%>
-
-    </div>
+            <li class="topcoat-list__item center ${uncapitalizedClassName}">${it}</li><%}}%>
+        </ul>
+    </section>
 
     <footer class="topcoat-tab-bar full bottom">
         <div class="topcoat-tab-bar__item center full">

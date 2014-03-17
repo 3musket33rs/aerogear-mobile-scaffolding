@@ -1,5 +1,5 @@
 {
-    "name": "MyTodo",
+    "name": "MyApplication",
     "version": "0.3.0",
     "dependencies": {
         "aerogear": "1.4.0",

@@ -42,6 +42,9 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
     void generateIndex(String destDir, domainClass) {
         Assert.hasText destDir, "Argument [destDir] not specified"
 
+        def destUpperDir = new File("$destDir/web-app/app/controller/");
+        if (!destUpperDir?.exists()) destUpperDir?.mkdirs()
+
         def destFile = new File("$destDir/web-app/app/controller/template.html")
         destFile.withWriter { w ->
             generateIndexForAllDomainClass(w, domainClass)
@@ -74,9 +77,6 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         def source = "$base/src/templates/scaffolding/"
         def destination = "$base/web-app/"
         def ant = new AntBuilder();
-        ant.copy(todir:destination + "js/") {
-            fileset(dir: source + "js/")
-        }
         ant.copy(todir:destination ) {
             fileset(dir: source + "bower/")
         }
@@ -242,10 +242,10 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
                     variantSecret: variantSecret,
                     grailsApp : grailsApplication]
             def templateResolved = t.make(binding).toString()
-            String resultBeginView = templateResolved.getAt(templateResolved.indexOf("// BeginView ${domainClass.shortName}") .. templateResolved.indexOf("// EndView ${domainClass.shortName}") + "// EndView ${domainClass.shortName}".length() - 1)
-            if (!content.contains(resultBeginView)) {
-                content = content.replace("// Insert Here View", resultBeginView + "\n// Insert Here View")
-            }
+            // String resultBeginView = templateResolved.getAt(templateResolved.indexOf("// BeginView ${domainClass.shortName}") .. templateResolved.indexOf("// EndView ${domainClass.shortName}") + "// EndView ${domainClass.shortName}".length() - 1)
+            // if (!content.contains(resultBeginView)) {
+            //     content = content.replace("// Insert Here View", resultBeginView + "\n// Insert Here View")
+            // }
 
             String resultBeginController = templateResolved.getAt(templateResolved.indexOf("// BeginController ${domainClass.shortName}") .. templateResolved.indexOf("// EndController ${domainClass.shortName}") + "// EndController ${domainClass.shortName}".length() - 1)
             if (!content.contains(resultBeginController)) {
@@ -269,10 +269,6 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         if(templateViewName == "AeroGearCore.js") {
             viewsDir = new File("$destDir/web-app")
         }
-
-        if(templateViewName == "Controller.js") {
-            viewsDir = new File("$destDir/web-app/app/controller")
-        }
         if(templateViewName == "DomainController.js") {
             viewsDir = new File("$destDir/web-app/app/" + domainClass.propertyName)
         }
@@ -295,22 +291,15 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         if(templateViewName == "AeroGearCore.js") {
             destFile = new File(viewsDir, "AeroGearCore.js")
             destFile?.withWriter { Writer writer ->
-                generateView domainClass, "js/" + templateViewName, writer
+                generateView domainClass, "/" + templateViewName, writer
             }
         }
         if(templateViewName == "run.js") {
             destFile = new File(viewsDir, "run.js")
             destFile?.withWriter { Writer writer ->
-                generateView domainClass, "js/" + templateViewName, writer
+                generateView domainClass, "/" + templateViewName, writer
             }
         }
-        if(templateViewName == "Controller.js") {
-            destFile = new File(viewsDir, "Controller.js")
-            destFile?.withWriter { Writer writer ->
-                generateView domainClass, "controller/" + templateViewName, writer
-            }
-        }
-
         if(templateViewName == "DomainController.js") {
             destFile = new File(viewsDir, domainClass.shortName + "Controller.js")
             destFile?.withWriter { Writer writer ->
@@ -339,35 +328,27 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
             destFile = new File(viewsDir, "main.js")
             if (!destFile?.exists()) {
                 String initialContent = """
-define({
-    theme: { modules: [
-    {module:'theme/topcoat-mobile-light.css'},
-        {module:'theme/custom.css'}
-]},
-controllerView: {
-    render: {
-    template: { module: 'text!app/controller/template.html' }
-},
-insert: { at: 'dom.first!body' }
-},
-controller: {
-    on: {
-    controllerView: {
-    // Insert Here View
-    }
-}
-},
-// Insert Here Controller
-form: { module: 'cola/dom/form' },
-// Wire.js plugins
-\$plugins: [
-        { module: 'wire/dom', classes: { init: 'loading' } },
-        { module: 'wire/dom/render' }, { module: 'wire/on' },
-        { module: 'wire/connect' }, { module: 'wire/aop' },
-        { module: 'cola' }
-]
-});
-
+    define({
+       theme: { modules: [
+           {module:'theme/topcoat-mobile-light.css'},
+           {module:'theme/custom.css'}
+       ]},
+       controllerView: {
+           render: {
+               template: { module: 'text!app/controller/template.html' }
+           },
+           insert: { at: 'dom.first!body' }
+       },
+       // Insert Here Controller
+       form: { module: 'cola/dom/form' },
+       // Wire.js plugins
+       \$plugins: [
+           { module: 'wire/dom', classes: { init: 'loading' } },
+           { module: 'wire/dom/render' }, { module: 'wire/on' },
+           { module: 'wire/connect' }, { module: 'wire/aop' },
+           { module: 'cola' }
+       ]
+   });
 """
                 destFile?.withWriter {Writer writer ->
                     writer << initialContent

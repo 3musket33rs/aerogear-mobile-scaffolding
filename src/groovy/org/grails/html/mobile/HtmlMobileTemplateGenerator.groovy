@@ -242,14 +242,15 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
                     variantSecret: variantSecret,
                     grailsApp : grailsApplication]
             def templateResolved = t.make(binding).toString()
-            // String resultBeginView = templateResolved.getAt(templateResolved.indexOf("// BeginView ${domainClass.shortName}") .. templateResolved.indexOf("// EndView ${domainClass.shortName}") + "// EndView ${domainClass.shortName}".length() - 1)
-            // if (!content.contains(resultBeginView)) {
-            //     content = content.replace("// Insert Here View", resultBeginView + "\n// Insert Here View")
-            // }
 
             String resultBeginController = templateResolved.getAt(templateResolved.indexOf("// BeginController ${domainClass.shortName}") .. templateResolved.indexOf("// EndController ${domainClass.shortName}") + "// EndController ${domainClass.shortName}".length() - 1)
             if (!content.contains(resultBeginController)) {
                 content = content.replace("// Insert Here Controller", resultBeginController + "\n// Insert Here Controller")
+            }
+
+            String resultPush = templateResolved.getAt(templateResolved.indexOf("// BeginPush") .. templateResolved.indexOf("// EndPush") + "// EndPush".length() - 1)
+            if (!content.contains(resultPush)) {
+                content = content.replace("// Insert Here Push", resultPush + "\n// Insert Here Push")
             }
 
             out << content
@@ -267,6 +268,9 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
             viewsDir = new File("$destDir/web-app")
         }
         if(templateViewName == "AeroGearCore.js") {
+            viewsDir = new File("$destDir/web-app")
+        }
+        if(templateViewName == "AeroGearPush.js") {
             viewsDir = new File("$destDir/web-app")
         }
         if(templateViewName == "DomainController.js") {
@@ -290,6 +294,12 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
 
         if(templateViewName == "AeroGearCore.js") {
             destFile = new File(viewsDir, "AeroGearCore.js")
+            destFile?.withWriter { Writer writer ->
+                generateView domainClass, "js/" + templateViewName, writer
+            }
+        }
+        if(templateViewName == "AeroGearPush.js") {
+            destFile = new File(viewsDir, "AeroGearPush.js")
             destFile?.withWriter { Writer writer ->
                 generateView domainClass, "js/" + templateViewName, writer
             }
@@ -341,6 +351,27 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
        },
        // Insert Here Controller
        form: { module: 'cola/dom/form' },
+        aeroGearPush: {
+            create: {
+                module: '../AeroGearPush',
+                args: [{
+                    // Insert Here Push
+                    successHandler: function(result) {
+                        console.log(result);
+                        alert(result);
+                    },
+                    errorHandler: function (error) {
+                        console.log(error);
+                        alert(error);
+                    },
+
+                    onNotification: function (e) {
+                        alert(e.alert);
+                    }
+                }]
+            }
+
+        },
        // Wire.js plugins
        \$plugins: [
            { module: 'wire/dom', classes: { init: 'loading' } },

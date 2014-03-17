@@ -65,6 +65,31 @@ define({
     },
     // EndController ${className}
     form: { module: 'cola/dom/form' },
+            aeroGearPush: {
+            create: {
+                module: '../AeroGearPush',
+                args: [{
+                    // BeginPush
+                    pushServerURL: "${pushServerURL}",
+                    variantID: "${variantID}",
+                    variantSecret: "${variantSecret}",
+                    // EndPush
+                    successHandler: function(result) {
+                        console.log(result);
+                        alert(result);
+                    },
+                    errorHandler: function (error) {
+                        console.log(error);
+                        alert(error);
+                    },
+
+                    onNotification: function (e) {
+                        alert(e.alert);
+                    }
+                }]
+            }
+
+        },
     // Wire.js plugins
     \$plugins: [
 		{ module: 'wire/dom', classes: { init: 'loading' } },

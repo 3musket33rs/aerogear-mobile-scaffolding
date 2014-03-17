@@ -24,7 +24,7 @@ define({
         bind: {
             to: { \$ref: '${classNameLowerCase}s' },
             bindings : {
-                ${props[0].name}: ".${props[0].name}",
+                ${props[0].name}: ".${props[0].name}"
             }
         }
     },

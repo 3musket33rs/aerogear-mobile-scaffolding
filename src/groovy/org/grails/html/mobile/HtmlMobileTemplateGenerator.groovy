@@ -291,7 +291,7 @@ class HtmlMobileTemplateGenerator extends DefaultGrailsTemplateGenerator {
         if(templateViewName == "AeroGearCore.js") {
             destFile = new File(viewsDir, "AeroGearCore.js")
             destFile?.withWriter { Writer writer ->
-                generateView domainClass, "/" + templateViewName, writer
+                generateView domainClass, "js/" + templateViewName, writer
             }
         }
         if(templateViewName == "run.js") {

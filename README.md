@@ -21,7 +21,11 @@ To test it
 ===========
 * Pre-requisites
 
-Make our domain class RESTful
+  * npm installed
+  * bower installed
+  * Grails 2.3.6+
+  * make our domain class RESTful
+
 In domain class:
 
     import grails.rest.*
@@ -32,10 +36,6 @@ In domain class:
         }
     }
 
-
-In URLMapping for exemple:
-
-    "/talks"(resources:"talk")
 
 * Generate the view
 Use command line:
@@ -48,7 +48,7 @@ grails html-generate-views org.myproject.MyDomainClass
 
 ```
 cd web-app
-bower install
+npm install
 grails run-app
 ```
 

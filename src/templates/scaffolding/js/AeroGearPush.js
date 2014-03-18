@@ -10,8 +10,8 @@
                 push.register(pushConfig.successHandler, pushConfig.errorHandler, {"badge": "true", "sound": "true",
                     "ecb": "onNotification", pushConfig: pushConfig});
             } catch (err) {
-                txt = "There was an error on this page.\n\n";
-                txt += "Error description: " + err.message + "\n\n";
+                txt = "There was an error on this page.";
+                txt += "Error description: " + err.message;
                 alert(txt);
             }
         }

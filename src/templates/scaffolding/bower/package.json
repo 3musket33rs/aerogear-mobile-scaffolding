@@ -1,0 +1,33 @@
+{
+	"name": "MyApplication",
+	"version": "0.0.1",
+	"description": "An application created with aerogear-mobile-scaffolding! http://github.com/3musket33rs/aerogear-mobile-scaffolding.",
+	"keywords": ["modules", "ioc", "promises", "aop", "rest", "cujo", "cujojs"],
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "http://www.opensource.org/licenses/mit-license.php"
+		},
+		{
+			"type":"Apache 2.0",
+			"url":"http://something"
+		}
+	],
+	"maintainers": [
+		{
+			"name": "Corinne Krych",
+			"web": "http://corinnerych.org"
+		}
+	],
+	"dependencies": {"mathsync": "~0.4.0","buffer":"2.1.3"},
+	"devDependencies": {
+		"serv": "",
+		"bower": "",
+		"cram": "~0.7"
+	},
+	"scripts": {
+		"install": "bower install",
+		"start": "serv --port 8000",
+		"cram": "cram index.html --include curl/plugin/domReady --include curl/plugin/locale"
+	}
+}

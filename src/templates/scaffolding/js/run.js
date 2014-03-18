@@ -28,6 +28,12 @@
 			{ name: 'meld', location: 'bower_components/meld', main: 'meld' },
 			{ name: 'csst', location: 'bower_components/csst', main: 'css', config: { moduleLoader: 'curl/loader/cjsm11' } },
 			{ name: 'aerogear', location: 'bower_components/aerogear', main: 'aerogear.js', config: { moduleLoader: 'curl/loader/legacy', exports: 'AeroGear'} },
+			{ name: 'rusha', location: 'node_modules/mathsync/node_modules/rusha/', main: 'rusha',config: { moduleLoader: 'curl/loader/cjsm11'} },
+			{ name: 'es6-promise', location: 'node_modules/mathsync/node_modules/es6-promise/', main: 'dist/commonjs/main', config: { moduleLoader: 'curl/loader/cjsm11'} },
+			{ name: 'buffer', location: 'node_modules/buffer/', main: 'index', config: { moduleLoader: 'curl/loader/cjsm11'} },
+			{ name: 'base64-js', location: 'node_modules/buffer/node_modules/base64-js/lib', main: 'b64', config: { moduleLoader: 'curl/loader/cjsm11'} },
+			{ name: 'ieee754', location: 'node_modules/buffer/node_modules/ieee754/', main: 'index', config: { moduleLoader: 'curl/loader/cjsm11'} },
+			{ name: 'mathsync', location: 'node_modules/mathsync/src/', main: 'index', config: { moduleLoader: 'curl/loader/cjsm11'} },
 			{ name: 'poly', location: 'bower_components/poly' }
 		],
 		// Turn off i18n locale sniffing. Change or remove this line if you want

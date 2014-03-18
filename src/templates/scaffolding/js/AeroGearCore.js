@@ -4,16 +4,24 @@ define(function (require) {
 
 	when = require('when');
 	require('aerogear');
-
-	function AeroGearCore(client, namespace, config) {
+	var ms = require('mathsync');
+	
+	function AeroGearCore(client, namespace, config, model, className) {
 		this._rest = AeroGear.Pipeline({
 			baseURL: client
 		}).add(namespace).pipes[namespace];
 		
+		this._syncrest = AeroGear.Pipeline({
+			baseURL: client
+		}).add('sync').pipes['sync'];
+
 		var dataManager = AeroGear.DataManager();
 		if (config != null) {
 			config.name = namespace
 		}
+		
+		this._model = model;
+		this._className = className;
 		
 		config ? dataManager.add(config) : dataManager.add(namespace);
 		this._dataManager = dataManager.stores[namespace];
@@ -31,25 +39,12 @@ define(function (require) {
 			});
 		}
 		var self = this;
-		this._rest.read({
-			success: function(data) {
-				self._data = [];
-				data.forEach(function(item) {
-					item.id = parseInt(item.id);
-					self._data.push(item);
-				});
-				self._dataManager.remove();
-				self._dataManager.save(data);
-			},
-			error: function(error) {
-				self._data = self._dataManager.read();
-			}
-		});
-		this._online = true;
+		this._online = navigator.onLine;
 		this._offlineAction = [];
 		window.addEventListener('online',  function() {
 			self._online = true;
 			self._push();
+			//self._sync();
 		});
 		window.addEventListener('offline', function(){
 			self._online = false;
@@ -57,62 +52,83 @@ define(function (require) {
 	}
 
 	AeroGearCore.prototype = {
-		provide: true,
-		forEach: function(lambda) {
-			console.log("forEach in AeroGearCore");
-			this._data.forEach(function(data) {
-				lambda(data);
-			});
+		provide: false,
+		load: function() {
+			if (this._online) {
+				var self = this;
+				return this._rest.read({
+					success: function(data) {
+						data.forEach(function(item) {
+							item.id = parseInt(item.id);
+						});
+						self._dataManager.remove();
+						self._dataManager.save(data);
+						return data
+					},
+					error: function(error) {
+						console.log("Error in load");
+						return error;
+					}
+				});
+			} else {
+				return this._dataManager.read();
+			}
 		},
 		add: function(item) {
 			console.log("add in AeroGearCore");
 			var self = this;
 			if (this._online) {
-				this._rest.save(item, {
+				return this._rest.save(item, {
 					success: function(data) {
-						item.id = parseInt(data.id);
+						data.id = parseInt(data.id);
 						self._dataManager.save(data);
+						return data;
 					},
 					error: function(error) {
-						console.log("Error in remove send");
+						console.log("Error in add send");
+						return error;
 					}
 				});
 			} else {
-				this._offlineAction.push({action: 'add', item: data});
+				this._offlineAction.push({action: 'add', item: item});
 			}
 		},
 		remove: function(item) {
 			console.log("remove in AeroGearCore");
+			item.id = parseInt(item.id);
 			var self = this;
 			if (this._online) {
-				this._rest.remove(item, {
-					success: function(data) {
+				return this._rest.remove(item, {
+					success: function() {
 						self._dataManager.remove(item);
+						return item;
 					},
 					error: function(error) {
 						console.log("Error in remove send");
+						return error;
 					}
 				});
 			} else {
-				this._offlineAction.push({action: 'remove', item: data});
+				this._offlineAction.push({action: 'remove', item: item});
 			}
 		},
 		update: function(item) {
 			console.log("update in AeroGearCore");
-			var deferred = when.defer();
+			item.id = parseInt(item.id);
 			var self = this;
 			if (this._online) {
-				this._rest.save(item, {
+				return this._rest.save(item, {
 					success: function(data) {
-						item.id = parseInt(data.id);
-						self._dataManager.save(item);
+						self._dataManager.save(data);
+						return data;
 					},
 					error: function(error) {
 						console.log("Error in remove send");
+						return error;
 					}
 				});
 			} else {
-				this._offlineAction.push({action: 'update', item: data});
+				this._offlineAction.push({action: 'update', item: item});
 			}
 		},
 		clear: function() {
@@ -122,6 +138,49 @@ define(function (require) {
 			var self = this;
 			this._offlineAction.forEach(function(data, index) {
 				self[data.action].apply(self, [data.item]);
+			});
+		},
+		_sync: function() {
+			var local = ms.summarizer.fromItems(this._dataManager.read(), ms.serialize.fromString());
+			function fetchSummary(level) {
+				return this._syncrest.read({id: level}, {
+					success: function(summary) {
+						return JSON.parse(summary);
+					},
+					error: function(error) {
+						console.log('Unable to sync');
+					}
+				});
+			}
+			var remote = ms.summarizer.fromJSON(fetchSummary);	
+			var resolveDiff = ms.resolver.fromSummarizers(local, remote, ms.serialize.toString());
+			resolveDiff().then(function (difference) { 	
+				if(difference.added.length != 0 || difference.removed.length != 0) {
+					difference.updated = [];
+					var i,j;
+					for (i = 0; i <  difference.added; i+=1) {			
+						for (j = 0; j < difference.removed.length; ++j) {
+							if(difference.added[j].id === difference.removed[j].id) {
+								difference.removed[j].splice(j, 1);
+								difference.updated.push(difference.added[j].splice(i, 1));
+								i--; j--;
+								break;
+							} 
+						}
+					}
+					difference.added.forEach(function(data){
+						data.id = parseInt(data.id);
+						self._model.add(data);
+					});
+					difference.removed.forEach(function(data){
+						data.id = parseInt(data.id);
+						self._model.remove(data);
+					});
+					difference.updated.forEach(function(data){
+						data.id = parseInt(data.id);
+						self._model.update(data);
+					});
+				}				
 			});
 		}
 	};

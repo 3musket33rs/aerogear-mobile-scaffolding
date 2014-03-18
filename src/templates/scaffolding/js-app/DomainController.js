@@ -9,6 +9,7 @@ define(function (require, exports, module) {
     module.exports = ${className}sController;
 
     var csst = require('csst');
+    var when = require('when');
     var form = require('cola/dom/form');
     var slice = Array.prototype.slice;
     var update = csst.lift(csst.toggle('hidden'));
@@ -29,9 +30,41 @@ define(function (require, exports, module) {
         changeView('.${classNameLowerCase}-display', 'update');
     };
 
-    ${className}sController.prototype.save = ${className}sController.prototype.delete = function() {
+    ${className}sController.prototype.load = function() {
+        var self = this;
+        when(this._aerogear.load()).then(function(items){
+            items.forEach(function(item) {
+                self._model.add(item);
+            });
+        });
+    };
+
+    ${className}sController.prototype.add = function() {
         var ${classNameLowerCase} = form.getValues(this._form);
-        ${classNameLowerCase}.id = parseInt(${classNameLowerCase}.id);
+        var self = this;
+        when(this._aerogear.add(${classNameLowerCase})).then(function(item){
+            self._model.add(item);
+        });
+        changeView('.${classNameLowerCase}s-list', 'list');
+        return ${classNameLowerCase};
+    };
+
+    ${className}sController.prototype.update = function() {
+        var ${classNameLowerCase} = form.getValues(this._form);
+        var self = this;
+        when(this._aerogear.update(${classNameLowerCase})).then(function(item){
+            self._model.update(item);
+        });
+        changeView('.${classNameLowerCase}s-list', 'list');
+        return ${classNameLowerCase};
+    };
+
+    ${className}sController.prototype.remove = function() {
+        var ${classNameLowerCase} = form.getValues(this._form);
+        var self = this;
+        when(this._aerogear.remove(${classNameLowerCase})).then(function(){
+            self._model.remove(${classNameLowerCase});
+        });
         changeView('.${classNameLowerCase}s-list', 'list');
         return ${classNameLowerCase};
     };

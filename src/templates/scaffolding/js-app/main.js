@@ -35,16 +35,18 @@ define({
         create: 'app/${classNameLowerCase}/${className}Controller',
         properties: {
             _form: { \$ref: "${classNameLowerCase}sForm"},
-            _updateForm: { \$ref: 'form.setValues' }
+            _updateForm: { \$ref: 'form.setValues' },
+            _model:{ \$ref: '${classNameLowerCase}s'},
+            _aerogear:{ \$ref: '${classNameLowerCase}Store'}
         },
         on: {
             ${classNameLowerCase}SectionView: {
                 'click:.display': '${classNameLowerCase}s.edit',
                 'click:.displayAdd': 'displayView',
                 'click:.cancel': 'cancel',
-                'click:.add': 'save | ${classNameLowerCase}s.add',
-                'click:.update': 'save | ${classNameLowerCase}s.update',
-                'click:.remove': 'save | ${classNameLowerCase}s.remove'
+                'click:.add': 'add',
+                'click:.update': 'update',
+                'click:.remove': 'remove'
             },
             controllerView: {
                 'click:.${classNameLowerCase}': 'cancel'
@@ -52,16 +54,14 @@ define({
         },
         connect :{
             '${classNameLowerCase}s.onEdit': "display"
-        }
+        },
+        ready: 'load'
     },
     ${classNameLowerCase}Store: {
         create: {
-        module: '../AeroGearCore',
-        args: ['http://localhost:8080/${project}/', '${classNameLowerCase}s', {type:'SessionLocal', settings :{storageType:'localStorage'}}]
-    },
-    bind: {
-        to: { \$ref: '${classNameLowerCase}s' }
-    }
+            module: '../AeroGearCore',
+            args: ['http://localhost:8080/${project}/', '${classNameLowerCase}s', {type:'SessionLocal', settings :{storageType:'localStorage'}}, { \$ref: '${classNameLowerCase}s' }, '${projectName}.${className}']
+        }
     },
     // EndController ${className}
     form: { module: 'cola/dom/form' },

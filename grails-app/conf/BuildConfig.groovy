@@ -24,9 +24,11 @@ grails.project.dependency.resolution = {
         //mavenRepo "https://oss.sonatype.org/content/repositories/snapshots"
     }
     dependencies {
+        compile 'eu.mais-h.mathsync:core:0.4.0'
     }
 
     plugins {
+
         compile ":scaffolding:2.0.2"
         build ':release:3.0.1', ':rest-client-builder:1.0.3', {
           export = false

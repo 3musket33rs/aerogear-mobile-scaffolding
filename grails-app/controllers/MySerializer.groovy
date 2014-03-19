@@ -11,6 +11,7 @@ class MySerializer implements Serializer {
     @Override
     byte[] serialize(Object o) {
         def json = o as JSON
+        println ">> Serialize object" + json.toString()
         json.toString().getBytes("UTF-8")
     }
 }

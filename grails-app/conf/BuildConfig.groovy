@@ -24,7 +24,7 @@ grails.project.dependency.resolution = {
         //mavenRepo "https://oss.sonatype.org/content/repositories/snapshots"
     }
     dependencies {
-        compile 'eu.mais-h.mathsync:core:0.4.0'
+        compile 'eu.mais-h.mathsync:core:0.3.0'
     }
 
     plugins {

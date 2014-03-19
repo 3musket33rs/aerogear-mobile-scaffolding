@@ -1,9 +1,6 @@
 import eu.mais_h.mathsync.Summarizer
 import eu.mais_h.mathsync.SummarizerFromItems
 import grails.converters.JSON
-import groovy.json.JsonBuilder
-
-//import grails.converters.JSON
 
 class SyncController {
     static allowedMethods = [sync:'GET']

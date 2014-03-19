@@ -142,10 +142,12 @@ define(function (require) {
 		},
 		_sync: function() {
 			var local = ms.summarizer.fromItems(this._dataManager.read(), ms.serialize.fromString());
+			var self = this;
 			function fetchSummary(level) {
-				return this._syncrest.read({id: level}, {
+				return self._syncrest.read({id: '{level:' + level + ', "className":"' + self._className + '"}', 
 					success: function(summary) {
-						return JSON.parse(summary);
+						console.log('Success ' + summary);
+						return summary;
 					},
 					error: function(error) {
 						console.log('Unable to sync');
@@ -156,6 +158,12 @@ define(function (require) {
 			var resolveDiff = ms.resolver.fromSummarizers(local, remote, ms.serialize.toString());
 			resolveDiff().then(function (difference) { 	
 				if(difference.added.length != 0 || difference.removed.length != 0) {
+					difference.added.forEach(function(data, i){
+						difference.added[i] = JSON.parse(data);
+					});
+					difference.removed.forEach(function(data, i){
+						difference.removed[i] = JSON.parse(data);
+					});
 					difference.updated = [];
 					var i,j;
 					for (i = 0; i <  difference.added; i+=1) {			

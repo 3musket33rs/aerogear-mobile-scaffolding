@@ -7,7 +7,7 @@ def uncapitalize(s) { s[0].toLowerCase() + s[1..-1]}
         </div>
     </header>
 
-    <section class="topcoat-list" style="margin-bottom: 4em">
+    <div class="topcoat-list" style="margin-bottom: 4em">
         <ul class="topcoat-list__container"><%
         className.each {
         def controllerClassNameLowerCase = it.toLowerCase()
@@ -17,7 +17,7 @@ def uncapitalize(s) { s[0].toLowerCase() + s[1..-1]}
         %>
             <li class="topcoat-list__item center ${uncapitalizedClassName}">${it}</li><%}}%>
         </ul>
-    </section>
+    </div>
 
     <footer class="topcoat-tab-bar full bottom">
         <div class="topcoat-tab-bar__item center full">

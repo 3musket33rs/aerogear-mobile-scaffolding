@@ -2,10 +2,12 @@
 def uncapitalize(s) { s[0].toLowerCase() + s[1..-1]}
 classNameLowerCase = uncapitalize(className)
 projectName = project.toLowerCase()
-%>
-<section class="${classNameLowerCase}s-section hidden">
+%><section class="${classNameLowerCase}s-section hidden">
     <header class="topcoat-navigation-bar">
-        <div class="topcoat-navigation-bar__item center full">
+        <div class="topcoat-navigation-bar__item left quarter" style="margin:0.7em auto;" >
+            <button class="topcoat-button controller" >Home</button>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
             <h1 class="topcoat-navigation-bar__title">${classNameLowerCase}</h1>
         </div>
     </header>

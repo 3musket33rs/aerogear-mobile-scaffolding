@@ -46,7 +46,8 @@ define({
                 'click:.cancel': 'cancel',
                 'click:.add': 'add',
                 'click:.update': 'update',
-                'click:.remove': 'remove'
+                'click:.remove': 'remove',
+                'click:.controller': 'displayController'
             },
             controllerView: {
                 'click:.${classNameLowerCase}': 'cancel'

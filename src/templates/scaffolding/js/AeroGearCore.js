@@ -23,8 +23,16 @@
             this._model = model;
             this._className = className;
 
-            config ? dataManager.add(config) : dataManager.add(namespace);
+            if (config) {
+                dataManager.add(config);
+                config.name = namespace + "_offline";
+                dataManager.add(config);
+            } else {
+                dataManager.add(namespace);
+                dataManager.add(namespace + "_offline");
+            }
             this._dataManager = dataManager.stores[namespace];
+            this._dataManagerOffline = dataManager.stores[namespace + "_offline"];
             if(config.type === "IndexedDB" || config.type === "WebSQL" ) {
                 // TODO Is there something to do in fact ?
                 this._dataManager.open({
@@ -41,6 +49,7 @@
             var self = this;
             this._online = navigator.onLine;
             this._offlineAction = [];
+            this._clientId = 0;
             window.addEventListener('online',  function() {
                 self._online = true;
                 self._push();
@@ -49,6 +58,9 @@
             window.addEventListener('offline', function(){
                 self._online = false;
             });
+            if(this._online) {
+                this._push();
+            }
         }
 
         AeroGearCore.prototype = {
@@ -76,7 +88,6 @@
                 }
             },
             add: function(item) {
-                console.log("add in AeroGearCore");
                 var self = this;
                 if (this._online) {
                     return this._rest.save(item, {
@@ -91,12 +102,16 @@
                         }
                     });
                 } else {
-                    this._offlineAction.push({action: 'add', item: item});
+                    item.id = "added-" + this._clientId;
+                    this._clientId++;
+                    this._dataManagerOffline.save({id:item.id, action: 'add', item: item});
+                    return item;
                 }
             },
             remove: function(item) {
-                console.log("remove in AeroGearCore");
-                item.id = parseInt(item.id);
+                if(!isNaN(parseInt(item.id))) {
+                    item.id = parseInt(item.id);
+                }
                 var self = this;
                 if (this._online) {
                     return this._rest.remove(item, {
@@ -110,12 +125,18 @@
                         }
                     });
                 } else {
-                    this._offlineAction.push({action: 'remove', item: item});
+                    if(!isNaN(parseInt(item.id))) {
+                        this._dataManagerOffline.save({id: item.id, action: 'remove', item: item});
+                    } else {
+                        this._dataManagerOffline.remove({id: item.id});
+                    }
+                    return item;
                 }
             },
             update: function(item) {
-                console.log("update in AeroGearCore");
-                item.id = parseInt(item.id);
+                if(!isNaN(parseInt(item.id))) {
+                    item.id = parseInt(item.id);
+                }
                 var self = this;
                 if (this._online) {
                     return this._rest.save(item, {
@@ -129,16 +150,32 @@
                         }
                     });
                 } else {
-                    this._offlineAction.push({action: 'update', item: item});
+                    if(!isNaN(parseInt(item.id))) {
+                        this._dataManagerOffline.save({id: item.id, action: 'update', item: item});
+                    } else {
+                        this._dataManagerOffline.save({id: item.id, action: 'add', item: item});
+                    }
+                    return item;
                 }
             },
             clear: function() {
                 console.log("clear in AeroGearCore");
             },
             _push: function() {
+                console.log("I am in push")
                 var self = this;
-                this._offlineAction.forEach(function(data, index) {
-                    self[data.action].apply(self, [data.item]);
+                this._dataManagerOffline.read().then(function(items) {
+                    items.reverse().forEach(function(item) {
+                        console.log("Before remove " + item.action);
+                        console.log("Before remove " + item.id);
+                        self._dataManagerOffline.remove(item).then(function() {
+                            if (item.action === 'add') {
+                                delete item.item.id;
+                            }
+                            console.log(item.action);
+                            self[item.action].apply(self, [item.item]);
+                        });
+                    });
                 });
             },
             _sync: function() {

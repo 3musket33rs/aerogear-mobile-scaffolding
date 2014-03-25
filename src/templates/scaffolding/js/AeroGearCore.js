@@ -193,8 +193,9 @@
                             }
                         });
                     }
+					var deserialize = ms.serialize.toString();
                     var remote = ms.summarizer.fromJSON(fetchSummary);
-                    var resolveDiff = ms.resolver.fromSummarizers(local, remote, ms.serialize.toString());
+                    var resolveDiff = ms.resolver.fromSummarizers(local, remote, deserialize);
                     resolveDiff().then(function (difference) {
                         if(difference.added.length != 0 || difference.removed.length != 0) {
                             difference.added.forEach(function(data, i){

@@ -15,8 +15,8 @@ define(function (require, exports, module) {
     form = require('cola/dom/form');
     update = csst.lift(csst.toggle('hidden'));
     map = Array.prototype.map;
-    qs = document.querySelector;
-    qsa = document.querySelectorAll
+    qs = document.querySelector.bind(document);
+    qsa = document.querySelectorAll.bind(document);
 
     function ${className}sController() {
     }

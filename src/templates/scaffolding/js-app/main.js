@@ -77,7 +77,7 @@ define({
                     // EndPush
                     successHandler: function(result) {
                         console.log(result);
-                        alert(result);
+                        //alert(result);
                     },
                     errorHandler: function (error) {
                         console.log(error);
